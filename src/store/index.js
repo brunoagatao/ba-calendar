@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import moment from 'moment-timezone';
+import Axios from 'axios';
 moment.tz.setDefault('UTC');
 
 Vue.use(Vuex);
@@ -43,13 +44,29 @@ export default new Vuex.Store({
       state.eventFormActive = payload;
     },
     addEvent(state, payload) {
-      state.events.push({
-        description: payload,
-        date: state.eventFormDate
-      });
+      state.events.push(payload);
     },
     eventFormSetDate(state, payload) {
       state.eventFormDate = payload;
+    }
+  },
+  actions: {
+    addEvent(context, payload) {
+      return new Promise((resolve, reject) => {
+        const obj = {
+          description: payload,
+          date: context.state.eventFormDate
+        };
+
+        Axios.post('/add_event', obj).then((res) => {
+          if (res.status === 200) {
+            context.commit('addEvent', obj);
+            resolve();
+          } else {
+            reject();
+          }
+        });
+      });
     }
   }
 });

@@ -22,9 +22,10 @@ export default {
     create() {
       if (!this.description.length) return;
 
-      this.$store.commit('addEvent', this.description);
-      this.description = '';
-      this.$store.commit('eventFormSetActive', false);
+      this.$store.dispatch('addEvent', this.description).then(() => {
+        this.description = '';
+        this.$store.commit('eventFormSetActive', false);
+      });
     },
     close() {
       this.$store.commit('eventFormSetActive', false);
