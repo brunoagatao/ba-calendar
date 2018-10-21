@@ -14,7 +14,8 @@
     "webpack-config-output:dev": "rm -rf tmp/ && mkdir tmp && set NODE_ENV=development&& node ./scripts/webpack-config-output.js",
     "build": "webpack -p --env production",
     "start": "set NODE_ENV=production&& npm run build && node server.js",
-    "webpack-config-output:prod": "rm -rf tmp/ && mkdir tmp && set NODE_ENV=production&& node ./scripts/webpack-config-output.js"
+    "webpack-config-output:prod": "rm -rf tmp/ && mkdir tmp && set NODE_ENV=production&& node ./scripts/webpack-config-output.js",
+    "heroku-postbuild": "npm run webpack-config-output:prod"
   },
   "dependencies": {
     "axios": "^0.15.3",
