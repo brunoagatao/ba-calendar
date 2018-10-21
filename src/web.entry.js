@@ -11,6 +11,4 @@ const events = window.__INITIAL_STATE__.map((event) => {
   };
 });
 
-setTimeout(() => {
-  VueCalendar(events).$mount('#app');
-}, 2000);
+VueCalendar(events).$mount('#app');

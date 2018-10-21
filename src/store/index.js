@@ -8,8 +8,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    currentYear: 2018,
-    currentMonth: 10,
+    currentYear: parseInt(moment().format('YYYY')),
+    currentMonth: parseInt(moment().format('M')),
     eventFormPosX: 0,
     eventFormPosY: 0,
     eventFormActive: false,

@@ -10,22 +10,15 @@ moment.tz.setDefault('UTC');
 const app = express();
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-const events = [
-  {
-    description: 'Random event 1',
-    date: moment('2018-10-10', 'YYYY-MM-DD')
-  },
-  {
-    description: 'Random event 2',
-    date: moment('2018-10-12', 'YYYY-MM-DD')
-  },
-  {
-    description: 'Random event 3',
-    date: moment('2018-10-14', 'YYYY-MM-DD')
-  }
-];
+const events = [];
 
 let renderer;
+if (process.env.NODE_ENV === 'production') {
+  const bundle = fs.readFileSync('./dist/node.bundle.js', 'utf8');
+  renderer = require('vue-server-renderer').createBundleRenderer(bundle);
+  app.use('/dist', express.static(path.join(__dirname, 'dist')));
+}
+
 app.get('/', (req, res) => {
   const template = fs.readFileSync(path.resolve('./src/index.html'), 'utf-8');
   const contentMarker = '<!-- APP -->';
@@ -45,7 +38,9 @@ app.get('/', (req, res) => {
       }
     });
   } else {
-    res.send('<p>Awaiting compilation..</p>');
+    res.send(
+      '<p>Awaiting compilation..</p><script src="reload/reload.js"></script>'
+    );
   }
 });
 
@@ -65,7 +60,9 @@ if (process.env.NODE_ENV === 'development') {
   const reloadServer = reload(server, app);
   require('./webpack-dev-middleware').init(app);
   require('./webpack-server-compiler').init((bundle) => {
+    const needsReload = renderer === undefined;
     renderer = require('vue-server-renderer').createBundleRenderer(bundle);
+    if (needsReload) reloadServer.reload();
   });
 }
 
