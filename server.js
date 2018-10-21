@@ -25,29 +25,48 @@ const events = [
   }
 ];
 
-const template = fs.readFileSync(path.resolve('./src/index.html'), 'utf-8');
-const contentMarker = '<!-- APP -->';
+let renderer;
 app.get('/', (req, res) => {
-  res.send(
-    template.replace(
-      contentMarker,
-      `<script>var __INITIAL_STATE__ = ${serialize(events)}</script>`
-    )
-  );
+  const template = fs.readFileSync(path.resolve('./src/index.html'), 'utf-8');
+  const contentMarker = '<!-- APP -->';
+
+  if (renderer) {
+    renderer.renderToString({ events }, (err, html) => {
+      if (err) console.error(err);
+      else {
+        res.send(
+          template.replace(
+            contentMarker,
+            `<script>var __INITIAL_STATE__ = ${serialize(
+              events
+            )}</script>\n${html}`
+          )
+        );
+      }
+    });
+  } else {
+    res.send('<p>Awaiting compilation..</p>');
+  }
 });
 
 app.use(require('body-parser').json());
 app.post('/add_event', (req, res) => {
-  events.push(req.body);
+  events.push({
+    description: req.body.description,
+    date: moment(req.body.date)
+  });
   res.sendStatus(200);
 });
 
 const server = http.createServer(app);
 
 if (process.env.NODE_ENV === 'development') {
-  require('./webpack-dev-middleware').init(app);
   const reload = require('reload');
   const reloadServer = reload(server, app);
+  require('./webpack-dev-middleware').init(app);
+  require('./webpack-server-compiler').init((bundle) => {
+    renderer = require('vue-server-renderer').createBundleRenderer(bundle);
+  });
 }
 
 const port = process.env.PORT || 3000;
