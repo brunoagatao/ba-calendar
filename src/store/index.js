@@ -14,20 +14,7 @@ export default new Vuex.Store({
     eventFormPosY: 0,
     eventFormActive: false,
     eventFormDate: moment(),
-    events: [
-      {
-        description: 'Random event 1',
-        date: moment('2018-10-10', 'YYYY-MM-DD')
-      },
-      {
-        description: 'Random event 2',
-        date: moment('2018-10-12', 'YYYY-MM-DD')
-      },
-      {
-        description: 'Random event 3',
-        date: moment('2018-10-14', 'YYYY-MM-DD')
-      }
-    ]
+    events: []
   },
   mutations: {
     setCurrentMonth(state, payload) {
